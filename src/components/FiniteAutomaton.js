@@ -67,7 +67,7 @@ const FiniteAutomaton = () => {
     const columnIndex = header.findIndex((column) => column.value === leftmostDigit);
     const rowIndex = body.findIndex((row) => row.key === stackTop);
 
-    return body[rowIndex].values[columnIndex] || null;
+    return columnIndex >= 0 && rowIndex >= 0 ? body[rowIndex].values[columnIndex] : null;
   };
 
   const updateStack = (currentStack, action) => {
@@ -93,7 +93,6 @@ const FiniteAutomaton = () => {
       },
     ];
 
-    console.log(`Iteração ${currentIteration} =>`, currentBody);
     return currentBody;
   };
 
@@ -104,7 +103,6 @@ const FiniteAutomaton = () => {
       let iterations = 0;
       let newBody = [];
 
-      let cont = 0;
       while (localSentence.length > 0) {
         iterations += 1;
         const stackTop = getStackTop(stack);
@@ -129,17 +127,21 @@ const FiniteAutomaton = () => {
           }
         } else {
           action = getAction(stackTop, leftmostDigit); // S→aAd
-          if (action) {
+          if (action && action !== '-') {
             newBody = addLine(stack, localSentence, action, iterations, newBody);
-
             stack = updateStack(stack, action);
           } else {
-            addLine(stack, localSentence, `ERRO em ${iterations} iterações`, newBody);
+            newBody = addLine(
+              stack,
+              localSentence,
+              `ERRO em ${iterations} iterações`,
+              iterations,
+              newBody
+            );
+            setLocalBody(newBody);
+            break;
           }
         }
-
-        cont += 1;
-        if (cont >= 30) break;
       }
     }
   }, [showFiniteAutomaton, sentence]);
