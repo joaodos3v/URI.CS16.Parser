@@ -13,6 +13,7 @@ import BaseInformation from './components/BaseInformation';
 import ParsingTable from './components/ParsingTable';
 import SentencesInput from './components/SentencesInput';
 import FiniteAutomaton from './components/FiniteAutomaton';
+import Footer from './components/Footer';
 
 import store from './store';
 
@@ -77,6 +78,7 @@ function App() {
           </Grid>
         </Grid>
       </div>
+      <Footer />
     </Provider>
   );
 }
