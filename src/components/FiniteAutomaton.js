@@ -9,8 +9,13 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
-import { parsingTable, finiteAutomaton, DOLLAR } from '../utils/constants';
+import MobileStepper from '@material-ui/core/MobileStepper';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import { finiteAutomaton } from '../utils/constants';
+import { recognizeSentence } from '../utils/functions';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -40,111 +45,38 @@ const useStyles = makeStyles((theme) => ({
 
 const FiniteAutomaton = () => {
   const classes = useStyles();
-  const { header, body } = parsingTable;
-  const { header: localHeader } = finiteAutomaton;
-  const sentence = useSelector((state) => state.sentence);
-  const showFiniteAutomaton = useSelector((state) => state.showFiniteAutomaton);
-  const [localBody, setLocalBody] = useState([]);
+  const { sentence, showFiniteAutomaton, stepByStep } = useSelector((state) => state);
+  const { header } = finiteAutomaton;
+  const [body, setBody] = useState([]);
+  const [stack, setStack] = useState([]);
+  const [activeStep, setActiveStep] = useState(1);
 
-  const getAlign = (index) => {
-    switch (index) {
-      case 0:
-        return 'left';
-
-      case 1:
-        return 'right';
-
-      default:
-        return 'center';
-    }
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
-  const getLeftmostDigit = (input) => input[0];
-
-  const getStackTop = (stack) => stack[stack.length - 1];
-
-  const getAction = (stackTop, leftmostDigit) => {
-    const columnIndex = header.findIndex((column) => column.value === leftmostDigit);
-    const rowIndex = body.findIndex((row) => row.key === stackTop);
-
-    return columnIndex >= 0 && rowIndex >= 0 ? body[rowIndex].values[columnIndex] : null;
-  };
-
-  const updateStack = (currentStack, action) => {
-    const stackTop = getStackTop(currentStack);
-    let newStackTop = '';
-
-    if (action !== 'Read' && !action.includes('ε')) {
-      const cutoff = action.indexOf('→') + 1;
-      const newPiece = action.substr(cutoff);
-      newStackTop = newPiece.split('').reverse().join('');
-    }
-
-    // Ps: can't use replace because it will remove the first occurrence!
-    return currentStack.substr(0, currentStack.lastIndexOf(stackTop)) + newStackTop;
-  };
-
-  const addLine = (currentStack, currentSentence, currentAction, currentIteration, newBody) => {
-    const currentBody = [
-      ...newBody,
-      {
-        key: currentIteration,
-        values: [currentStack, currentSentence, currentAction],
-      },
-    ];
-
-    return currentBody;
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
   useEffect(() => {
     if (showFiniteAutomaton) {
-      let stack = '$S';
-      let localSentence = `${sentence}$`;
-      let iterations = 0;
-      let newBody = [];
+      const tabularTopDownPredictiveStack = recognizeSentence(sentence);
+      console.log('tabularTopDownPredictiveStack', tabularTopDownPredictiveStack);
+      console.log('TAMANHO DA PILHA', tabularTopDownPredictiveStack.length);
 
-      while (localSentence.length > 0) {
-        iterations += 1;
-        const stackTop = getStackTop(stack);
-        const leftmostDigit = getLeftmostDigit(localSentence);
-        let action = null;
-
-        if (stackTop === leftmostDigit) {
-          if (stackTop === DOLLAR) {
-            newBody = addLine(
-              stack,
-              localSentence,
-              `OK em ${iterations} iterações`,
-              iterations,
-              newBody
-            );
-            setLocalBody(newBody);
-            break;
-          } else {
-            newBody = addLine(stack, localSentence, `Ler ${leftmostDigit}`, iterations, newBody);
-            stack = updateStack(stack, 'Read');
-            localSentence = localSentence.substr(1);
-          }
-        } else {
-          action = getAction(stackTop, leftmostDigit); // S→aAd
-          if (action && action !== '-') {
-            newBody = addLine(stack, localSentence, action, iterations, newBody);
-            stack = updateStack(stack, action);
-          } else {
-            newBody = addLine(
-              stack,
-              localSentence,
-              `ERRO em ${iterations} iterações`,
-              iterations,
-              newBody
-            );
-            setLocalBody(newBody);
-            break;
-          }
-        }
+      if (stepByStep) {
+        setStack(tabularTopDownPredictiveStack);
+      } else {
+        setBody(tabularTopDownPredictiveStack);
       }
     }
-  }, [showFiniteAutomaton, sentence]);
+  }, [showFiniteAutomaton, sentence, stepByStep]);
+
+  useEffect(() => {
+    const stackVisiblePart = stack.slice(0, activeStep);
+    setBody(stackVisiblePart);
+  }, [stack, activeStep]);
 
   return showFiniteAutomaton ? (
     <>
@@ -155,20 +87,23 @@ const FiniteAutomaton = () => {
         <Table size="small" aria-label="customized table">
           <TableHead>
             <TableRow>
-              {localHeader.map(({ key, value }, index) => (
-                <StyledTableCell key={key} align={index === 0 ? 'left' : 'right'}>
+              {header.map(({ key, value }, index) => (
+                <StyledTableCell
+                  key={key}
+                  align={index === 0 ? 'left' : index === 1 ? 'right' : 'center'}
+                >
                   {value}
                 </StyledTableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {localBody.map(({ key, values }) => (
+            {body.map(({ key, values }) => (
               <TableRow key={key}>
                 {values.map((column, columnIndex) => (
                   <TableCell
                     key={`${column}-${String(columnIndex)}`}
-                    align={columnIndex === 0 ? 'left' : 'right'}
+                    align={columnIndex === 0 ? 'left' : columnIndex === 1 ? 'right' : 'center'}
                     component="th"
                     scope="row"
                   >
@@ -180,6 +115,25 @@ const FiniteAutomaton = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      {stepByStep && (
+        <MobileStepper
+          variant="progress"
+          steps={stack.length + 1}
+          position="static"
+          activeStep={activeStep}
+          className={classes.root}
+          nextButton={
+            <Button size="small" onClick={handleNext} disabled={activeStep === stack.length}>
+              Próximo <KeyboardArrowRight />
+            </Button>
+          }
+          backButton={
+            <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
+              <KeyboardArrowLeft /> Anterior
+            </Button>
+          }
+        />
+      )}
     </>
   ) : (
     <Typography

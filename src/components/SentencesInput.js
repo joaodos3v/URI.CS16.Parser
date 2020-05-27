@@ -8,6 +8,8 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
@@ -27,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 function SentencesInput() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const [stepByStep, setStepByStep] = useState(false);
   const [localSentence, setLocalSentence] = useState('');
 
   const newSentence = () => {
@@ -41,7 +44,7 @@ function SentencesInput() {
 
   const startDemo = () => {
     // TODO: implement validation for blank sentence
-    return dispatch(Actions.startDemo(localSentence));
+    return dispatch(Actions.startDemo(localSentence, stepByStep));
   };
 
   const resetDemo = () => {
@@ -49,9 +52,13 @@ function SentencesInput() {
     return dispatch(Actions.resetDemo());
   };
 
+  const handleStepByStep = () => {
+    setStepByStep(!stepByStep);
+  };
+
   return (
     <Grid container className={classes.wrapper}>
-      <Grid item xs={8}>
+      <Grid item xs={6} md={8}>
         <FormControl variant="outlined" fullWidth>
           <InputLabel htmlFor="generate-new-sentence">Sentença</InputLabel>
           <OutlinedInput
@@ -70,26 +77,34 @@ function SentencesInput() {
           />
         </FormControl>
       </Grid>
-      <Grid item xs={4}>
-        <Button
-          variant="contained"
-          color="secondary"
-          endIcon={<DeleteIcon />}
-          className={classes.button}
-          onClick={resetDemo}
-        >
-          Reset
-        </Button>
-        <Button
-          variant="contained"
-          size="medium"
-          color="primary"
-          endIcon={<PlayArrowIcon />}
-          className={classes.button}
-          onClick={startDemo}
-        >
-          Iniciar
-        </Button>
+      <Grid item xs={6} md={4}>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={<Checkbox checked={stepByStep} onChange={handleStepByStep} color="primary" />}
+            label="Exibição Passo-a-Passo"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<DeleteIcon />}
+            className={classes.button}
+            onClick={resetDemo}
+          >
+            Reset
+          </Button>
+          <Button
+            variant="contained"
+            size="medium"
+            color="primary"
+            endIcon={<PlayArrowIcon />}
+            className={classes.button}
+            onClick={startDemo}
+          >
+            Iniciar
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );
