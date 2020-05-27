@@ -10,7 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Typography from '@material-ui/core/Typography';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
-import { parsingTable, finiteAutomaton } from '../utils/constants';
+import { parsingTable, finiteAutomaton, DOLLAR } from '../utils/constants';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -107,12 +107,12 @@ const FiniteAutomaton = () => {
       let cont = 0;
       while (localSentence.length > 0) {
         iterations += 1;
-        const stackTop = getStackTop(stack); // S
-        const leftmostDigit = getLeftmostDigit(localSentence); // a
+        const stackTop = getStackTop(stack);
+        const leftmostDigit = getLeftmostDigit(localSentence);
         let action = null;
 
         if (stackTop === leftmostDigit) {
-          if (stackTop === '$') {
+          if (stackTop === DOLLAR) {
             newBody = addLine(
               stack,
               localSentence,
@@ -139,7 +139,7 @@ const FiniteAutomaton = () => {
         }
 
         cont += 1;
-        if (cont >= 20) break;
+        if (cont >= 30) break;
       }
     }
   }, [showFiniteAutomaton, sentence]);

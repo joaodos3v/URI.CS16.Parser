@@ -1,8 +1,28 @@
+/**
+ * =================================================================
+ * Singles
+ * =================================================================
+ */
+export const DOLLAR = '$';
+
+export const EPSILON = 'ε';
+
+export const INITIAL_SYMBOL = 'S';
+
+export const EQUAL_SYMBOL = '::=';
+
+export const PRODUCTION_RULE_SEPARATOR = '|';
+
+/**
+ * =================================================================
+ * Base
+ * =================================================================
+ */
 export const grammar = [
-  ['S', '::=', 'aAd', '', '', '', ''],
-  ['A', '::=', 'aCb', '|', 'cCB', '', ''],
-  ['B', '::=', 'dBa', '|', 'bcS', '|', 'c'],
-  ['C', '::=', 'aSb', '|', 'ε', '', ''],
+  ['S', EQUAL_SYMBOL, 'aAd', '', '', '', ''],
+  ['A', EQUAL_SYMBOL, 'aCb', '|', 'cCB', '', ''],
+  ['B', EQUAL_SYMBOL, 'dBa', '|', 'bcS', '|', 'c'],
+  ['C', EQUAL_SYMBOL, 'aSb', '|', 'ε', '', ''],
 ];
 
 export const first = [
@@ -42,15 +62,12 @@ export const finiteAutomaton = {
     { key: 2, value: 'ENTRADA' },
     { key: 3, value: 'AÇÃO' },
   ],
-  // body: [
-  //   { key: 1, values: ['', 'abcdef', '-'] },
-  //   { key: 2, values: ['', 'abcdef', '-'] },
-  //   { key: 3, values: ['', 'abcdef', 'OK em 15 iterações'] },
-  // ],
 };
 
 /**
+ * =================================================================
  * Extras
+ * =================================================================
  */
 export const myGithub = 'https://github.com/joao-vieira';
 
