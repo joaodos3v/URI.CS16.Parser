@@ -71,6 +71,8 @@ export const finiteAutomaton = {
  */
 export const myGithub = 'https://github.com/joao-vieira';
 
+export const repository = 'https://github.com/joao-vieira/URI.CS16.Parser';
+
 export const myLinkedin = 'https://www.linkedin.com/in/jo%C3%A3o-vitor-veronese-vieira/';
 
 export const appDownload = 'https://github.com/joao-vieira/URI.CS16.Parser/archive/master.zip';

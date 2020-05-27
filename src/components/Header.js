@@ -8,7 +8,7 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import { Avatar } from '@material-ui/core';
-import { myGithub, myLinkedin, appDownload } from '../utils/constants';
+import { repository, myGithub, myLinkedin, appDownload } from '../utils/constants';
 import imageProfile from '../assets/imgs/profile.jpeg';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,7 +43,7 @@ const Header = () => {
           <IconButton aria-label="linkedin-author" href={myLinkedin} target="_blank">
             <LinkedInIcon className={classes.icon} />
           </IconButton>
-          <IconButton aria-label="github-author" href={myGithub} target="_blank">
+          <IconButton aria-label="github-author" href={repository} target="_blank">
             <GitHubIcon className={classes.icon} />
           </IconButton>
           <IconButton aria-label="github-author" href={myGithub} target="_blank">
