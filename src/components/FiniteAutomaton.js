@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -14,7 +14,7 @@ import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import MobileStepper from '@material-ui/core/MobileStepper';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import { finiteAutomaton } from '../utils/constants';
+import { finiteAutomaton, ACTION_ERROR, ACTION_ACCEPT } from '../utils/constants';
 import { recognizeSentence } from '../utils/functions';
 
 const StyledTableCell = withStyles((theme) => ({
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     padding: theme.spacing(2, 0),
   },
-  emptyWarning: {
+  empty: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -40,6 +40,14 @@ const useStyles = makeStyles((theme) => ({
     ...theme.typography.button,
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(10),
+  },
+  accept: {
+    color: theme.palette.primary.dark,
+    fontWeight: '600',
+  },
+  error: {
+    color: theme.palette.secondary.dark,
+    fontWeight: '600',
   },
 }));
 
@@ -49,7 +57,24 @@ const FiniteAutomaton = () => {
   const { header } = finiteAutomaton;
   const [body, setBody] = useState([]);
   const [stack, setStack] = useState([]);
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
+  const aligns = ['left', 'right', 'center'];
+
+  const formatMessage = useCallback(
+    (message) => {
+      let component = null;
+      if (message.indexOf(ACTION_ACCEPT) >= 0) {
+        component = <span className={classes.accept}>{message}</span>;
+      } else if (message.indexOf(ACTION_ERROR) >= 0) {
+        component = <span className={classes.error}>{message}</span>;
+      } else {
+        component = <span>{message.replace('$', ' $ ')}</span>;
+      }
+
+      return component;
+    },
+    [classes.error, classes.accept]
+  );
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -62,8 +87,6 @@ const FiniteAutomaton = () => {
   useEffect(() => {
     if (showFiniteAutomaton) {
       const tabularTopDownPredictiveStack = recognizeSentence(sentence);
-      console.log('tabularTopDownPredictiveStack', tabularTopDownPredictiveStack);
-      console.log('TAMANHO DA PILHA', tabularTopDownPredictiveStack.length);
 
       if (stepByStep) {
         setStack(tabularTopDownPredictiveStack);
@@ -74,7 +97,7 @@ const FiniteAutomaton = () => {
   }, [showFiniteAutomaton, sentence, stepByStep]);
 
   useEffect(() => {
-    const stackVisiblePart = stack.slice(0, activeStep);
+    const stackVisiblePart = stack.slice(0, activeStep + 1);
     setBody(stackVisiblePart);
   }, [stack, activeStep]);
 
@@ -88,10 +111,7 @@ const FiniteAutomaton = () => {
           <TableHead>
             <TableRow>
               {header.map(({ key, value }, index) => (
-                <StyledTableCell
-                  key={key}
-                  align={index === 0 ? 'left' : index === 1 ? 'right' : 'center'}
-                >
+                <StyledTableCell key={key} align={aligns[index]}>
                   {value}
                 </StyledTableCell>
               ))}
@@ -101,13 +121,8 @@ const FiniteAutomaton = () => {
             {body.map(({ key, values }) => (
               <TableRow key={key}>
                 {values.map((column, columnIndex) => (
-                  <TableCell
-                    key={`${column}-${String(columnIndex)}`}
-                    align={columnIndex === 0 ? 'left' : columnIndex === 1 ? 'right' : 'center'}
-                    component="th"
-                    scope="row"
-                  >
-                    {column}
+                  <TableCell key={`${column}-${String(columnIndex)}`} align={aligns[columnIndex]}>
+                    {formatMessage(column)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -117,31 +132,26 @@ const FiniteAutomaton = () => {
       </TableContainer>
       {stepByStep && (
         <MobileStepper
-          variant="progress"
-          steps={stack.length + 1}
+          variant="text"
+          steps={stack.length}
           position="static"
           activeStep={activeStep}
           className={classes.root}
-          nextButton={
-            <Button size="small" onClick={handleNext} disabled={activeStep === stack.length}>
-              Próximo <KeyboardArrowRight />
-            </Button>
-          }
           backButton={
             <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
               <KeyboardArrowLeft /> Anterior
+            </Button>
+          }
+          nextButton={
+            <Button size="small" onClick={handleNext} disabled={activeStep === stack.length - 1}>
+              Próximo <KeyboardArrowRight />
             </Button>
           }
         />
       )}
     </>
   ) : (
-    <Typography
-      variant="body1"
-      color="textSecondary"
-      align="center"
-      className={classes.emptyWarning}
-    >
+    <Typography variant="body1" color="textSecondary" align="center" className={classes.empty}>
       A pilha aparecerá aqui assim que você informar ou gerar uma sentença <InsertEmoticonIcon />
     </Typography>
   );

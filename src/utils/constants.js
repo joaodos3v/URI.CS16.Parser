@@ -9,9 +9,15 @@ export const EPSILON = 'ε';
 
 export const INITIAL_SYMBOL = 'S';
 
-export const EQUAL_SYMBOL = '::=';
+export const EQUAL_SYMBOL = '→';
 
 export const PRODUCTION_RULE_SEPARATOR = '|';
+
+export const ACTION_READ = 'READ';
+
+export const ACTION_ACCEPT = 'ACEITA';
+
+export const ACTION_ERROR = 'ERRO';
 
 /**
  * =================================================================

@@ -10,7 +10,7 @@ import BaseInformationPanels from './BaseInformationPanels';
 import { grammar, first, follow } from '../utils/constants';
 
 function BaseInformation() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <ExpansionPanel expanded={isExpanded} onChange={() => setIsExpanded(!isExpanded)}>

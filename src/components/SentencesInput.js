@@ -8,6 +8,7 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -43,12 +44,12 @@ function SentencesInput() {
   };
 
   const startDemo = () => {
-    // TODO: implement validation for blank sentence
-    return dispatch(Actions.startDemo(localSentence, stepByStep));
+    return localSentence ? dispatch(Actions.startDemo(localSentence, stepByStep)) : null;
   };
 
   const resetDemo = () => {
     setLocalSentence('');
+    setStepByStep(false);
     return dispatch(Actions.resetDemo());
   };
 
@@ -69,9 +70,11 @@ function SentencesInput() {
             labelWidth={70}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton aria-label="generate new sentence" onClick={newSentence} edge="end">
-                  <AutorenewIcon />
-                </IconButton>
+                <Tooltip title="Gerar Sentença">
+                  <IconButton aria-label="generate new sentence" onClick={newSentence} edge="end">
+                    <AutorenewIcon />
+                  </IconButton>
+                </Tooltip>
               </InputAdornment>
             }
           />
@@ -80,8 +83,15 @@ function SentencesInput() {
       <Grid item xs={6} md={4}>
         <Grid item xs={12}>
           <FormControlLabel
-            control={<Checkbox checked={stepByStep} onChange={handleStepByStep} color="primary" />}
-            label="Exibição Passo-a-Passo"
+            control={
+              <Checkbox
+                checked={stepByStep}
+                onChange={handleStepByStep}
+                color="primary"
+                disabled={!localSentence}
+              />
+            }
+            label="Exibição Passo a Passo"
           />
         </Grid>
         <Grid item xs={12}>
@@ -89,6 +99,7 @@ function SentencesInput() {
             variant="contained"
             color="secondary"
             endIcon={<DeleteIcon />}
+            disabled={!localSentence}
             className={classes.button}
             onClick={resetDemo}
           >
@@ -99,6 +110,7 @@ function SentencesInput() {
             size="medium"
             color="primary"
             endIcon={<PlayArrowIcon />}
+            disabled={!localSentence}
             className={classes.button}
             onClick={startDemo}
           >

@@ -1,6 +1,9 @@
 import {
   grammar,
   parsingTable,
+  ACTION_READ,
+  ACTION_ACCEPT,
+  ACTION_ERROR,
   PRODUCTION_RULE_SEPARATOR,
   EQUAL_SYMBOL,
   INITIAL_SYMBOL,
@@ -15,6 +18,10 @@ import {
  */
 const getRandomFromArray = (array) => {
   return array[Math.floor(Math.random() * array.length)];
+};
+
+const getRulesByLine = (localGrammar, line) => {
+  return localGrammar.find((currentLine) => currentLine.key === line);
 };
 
 const clearGrammar = (localGrammar) => {
@@ -39,7 +46,7 @@ export const generateSentence = () => {
   let currentLine = INITIAL_SYMBOL;
   let notFinishGeneration = true;
   while (notFinishGeneration) {
-    const currentProductionRules = cleanGrammar.find((line) => line.key === currentLine);
+    const currentProductionRules = getRulesByLine(cleanGrammar, currentLine);
 
     const currentRule = getRandomFromArray(currentProductionRules.values);
     if (!sentence) {
@@ -72,6 +79,10 @@ const getLeftmostDigit = (input) => input[0];
 
 const getStackTop = (stack) => stack[stack.length - 1];
 
+const getErrorMessage = (iterations) => `${ACTION_ERROR} em ${iterations} iterações`;
+
+const getAcceptMessage = (iterations) => `${ACTION_ACCEPT} em ${iterations} iterações`;
+
 const getAction = (stackTop, leftmostDigit) => {
   const { header, body } = parsingTable;
 
@@ -85,7 +96,7 @@ const updateStack = (currentStack, action) => {
   const stackTop = getStackTop(currentStack);
 
   let newStackTop = '';
-  if (action !== 'Read' && !action.includes('ε')) {
+  if (action !== ACTION_READ && !action.includes(EPSILON)) {
     const cutoff = action.indexOf('→') + 1;
     const newPiece = action.substr(cutoff);
     newStackTop = newPiece.split('').reverse().join('');
@@ -118,40 +129,25 @@ export const recognizeSentence = (sentence) => {
     iterations += 1;
     const stackTop = getStackTop(stack);
     const leftmostDigit = getLeftmostDigit(localSentence);
-    let action = null;
+    const action = getAction(stackTop, leftmostDigit);
 
     if (stackTop === leftmostDigit) {
       if (stackTop === DOLLAR) {
-        newBody = addRow(
-          stack,
-          localSentence,
-          `OK em ${iterations} iterações`,
-          iterations,
-          newBody
-        );
+        newBody = addRow(stack, localSentence, getAcceptMessage(iterations), iterations, newBody);
         tabularTopDownPredictiveStack = newBody;
         break;
       } else {
         newBody = addRow(stack, localSentence, `Ler ${leftmostDigit}`, iterations, newBody);
-        stack = updateStack(stack, 'Read');
+        stack = updateStack(stack, ACTION_READ);
         localSentence = localSentence.substr(1);
       }
+    } else if (action && action !== '-') {
+      newBody = addRow(stack, localSentence, action, iterations, newBody);
+      stack = updateStack(stack, action);
     } else {
-      action = getAction(stackTop, leftmostDigit);
-      if (action && action !== '-') {
-        newBody = addRow(stack, localSentence, action, iterations, newBody);
-        stack = updateStack(stack, action);
-      } else {
-        newBody = addRow(
-          stack,
-          localSentence,
-          `ERRO em ${iterations} iterações`,
-          iterations,
-          newBody
-        );
-        tabularTopDownPredictiveStack = newBody;
-        break;
-      }
+      newBody = addRow(stack, localSentence, getErrorMessage(iterations), iterations, newBody);
+      tabularTopDownPredictiveStack = newBody;
+      break;
     }
   }
 
