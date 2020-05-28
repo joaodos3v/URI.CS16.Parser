@@ -79,9 +79,11 @@ const getLeftmostDigit = (input) => input[0];
 
 const getStackTop = (stack) => stack[stack.length - 1];
 
-const getErrorMessage = (iterations) => `${ACTION_ERROR} em ${iterations} iterações`;
+const getErrorMessage = (iterations) =>
+  `${ACTION_ERROR} em ${iterations} ${iterations <= 1 ? 'iteração' : 'iterações'}`;
 
-const getAcceptMessage = (iterations) => `${ACTION_ACCEPT} em ${iterations} iterações`;
+const getAcceptMessage = (iterations) =>
+  `${ACTION_ACCEPT} em ${iterations} ${iterations <= 1 ? 'iteração' : 'iterações'}`;
 
 const getAction = (stackTop, leftmostDigit) => {
   const { header, body } = parsingTable;
