@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/URI.CS16.Parser/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/URI.CS16.Parser/static/js/main.cfca6a46.chunk.js",
+    "main.js.map": "/URI.CS16.Parser/static/js/main.cfca6a46.chunk.js.map",
+    "runtime-main.js": "/URI.CS16.Parser/static/js/runtime-main.bd1c3770.js",
+    "runtime-main.js.map": "/URI.CS16.Parser/static/js/runtime-main.bd1c3770.js.map",
+    "static/js/2.01a6361a.chunk.js": "/URI.CS16.Parser/static/js/2.01a6361a.chunk.js",
+    "static/js/2.01a6361a.chunk.js.map": "/URI.CS16.Parser/static/js/2.01a6361a.chunk.js.map",
+    "index.html": "/URI.CS16.Parser/index.html",
+    "precache-manifest.3a684a7b1520c8f7dcabee4a4d1ca811.js": "/URI.CS16.Parser/precache-manifest.3a684a7b1520c8f7dcabee4a4d1ca811.js",
+    "service-worker.js": "/URI.CS16.Parser/service-worker.js",
+    "static/css/main.5ecd60fb.chunk.css.map": "/URI.CS16.Parser/static/css/main.5ecd60fb.chunk.css.map",
+    "static/js/2.01a6361a.chunk.js.LICENSE.txt": "/URI.CS16.Parser/static/js/2.01a6361a.chunk.js.LICENSE.txt",
+    "static/media/profile.jpeg": "/URI.CS16.Parser/static/media/profile.390f2114.jpeg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.bd1c3770.js",
+    "static/js/2.01a6361a.chunk.js",
+    "static/css/main.5ecd60fb.chunk.css",
+    "static/js/main.cfca6a46.chunk.js"
+  ]
+}
